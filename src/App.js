@@ -37,6 +37,17 @@ mutation UpdateArticle($input: UpdateArticleByIdInput!) {
 }
 `;
 
+const DELETE_ARTICLE = gql`
+mutation DeleteArticle($input: DeleteArticleByIdInput!) {
+  deleteArticleById(input: $input) {
+    article {
+      id,
+      name
+    }
+  }
+}
+`;
+
 const CreateArticle = () => {
   let input;
 
@@ -104,40 +115,76 @@ const UpdateArticle = ({id, name}) => {
       mutation={UPDATE_ARTICLE}
     >
       {updateArticle => (
-        <div>
-          <p>{name}</p>
+        <form
+          onSubmit={e => {
+            e.preventDefault();
 
-          <form
-            onSubmit={e => {
-              e.preventDefault();
+            if (!input.value) return;
 
-              if (!input.value) return;
-
-              updateArticle({
-                variables: {
-                  input: {
-                    id: id,
-                    articlePatch: {
-                      name: input.value
-                    }
+            updateArticle({
+              variables: {
+                input: {
+                  id: id,
+                  articlePatch: {
+                    name: input.value
                   }
                 }
-              });
+              }
+            });
 
-              input.value = '';
+            input.value = '';
+          }}
+        >
+
+          <input
+            ref={node => {
+              input = node;
             }}
-          >
+          />
 
-            <input
-              ref={node => {
-                input = node;
-              }}
-            />
+          <button type="submit">Update</button>
 
-            <button type="submit">Update</button>
+        </form>
+      )}
+    </Mutation>
+  )
+}
 
-          </form>
-        </div>
+const DeleteArticle = ({id}) => {
+  return (
+    <Mutation
+      mutation={DELETE_ARTICLE}
+      update={(cache, {data}) => {
+        const { allArticles } = cache.readQuery({
+          query: GET_ARTICLES
+        });
+
+        cache.writeQuery({
+          query: GET_ARTICLES,
+          data: {
+            allArticles: {
+              nodes: [
+                ...allArticles.nodes.filter(article => article.id !== data.deleteArticleById.article.id)
+              ]
+            }
+          }
+        })
+      }}
+    >
+      {deleteArticle => (
+        <button
+          onClick={e => {
+            e.preventDefault();
+
+            deleteArticle({
+              variables: {
+                input: {
+                  id: id
+                }
+              }
+            })
+          }}
+        >Delete</button>
       )}
     </Mutation>
   )
@@ -155,7 +202,13 @@ const App = () => {
           if (error) return <p>Error :(</p>;
 
           return data.allArticles.nodes.map(({id, name}) => (
-            <UpdateArticle key={id} id={id} name={name} />
+            <div key={id}>
+              <strong>{name}</strong>
+
+              <UpdateArticle id={id} name={name} />
+
+              <DeleteArticle id={id} />
+            </div>
           )) 
         }}
       </Query>
