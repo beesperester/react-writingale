@@ -1,24 +1,37 @@
-import logo from './logo.svg';
 import './App.css';
+import React from 'react';
+
+import { useQuery } from '@apollo/react-hooks';
+import gql from "graphql-tag";
+
+const GET_ARTICLES = gql`
+{
+  allArticles{
+    nodes{
+      id,
+      name
+    }
+  }
+}
+`
 
 function App() {
+  const { data, loading, error } = useQuery(GET_ARTICLES);
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error</p>;
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <React.Fragment>
+
+      <h1>Articles</h1>
+      
+      {data && data.allArticles && data.allArticles.nodes.map((article, index) => (
+        <div key={index}>
+          {article.name}
+        </div>
+      ))}
+    </React.Fragment>
   );
 }
 
