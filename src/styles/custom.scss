@@ -1,0 +1,19 @@
+// Import Bootstrap and its default variables
+@import './variables';
+@import '~bootstrap/scss/bootstrap.scss';
+
+.card-toolbar + .card-toolbar-spacer {
+    display: block;
+
+    padding-bottom: 4rem;
+}
+
+.card-toolbar {
+    position: absolute;
+    bottom: 0;
+
+    padding: ($spacer * 1.25);
+}
+.btn > svg {
+    margin-right: ($spacer * 0.25);
+}

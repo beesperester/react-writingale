@@ -1,5 +1,10 @@
+// apollo
 import { useMutation } from '@apollo/react-hooks';
 
+// bootstrap
+import { Plus } from 'react-bootstrap-icons';
+
+// app
 import { RETRIEVE_ALL, CREATE } from './ArticleSchema';
 
 export const ArticleCreate = () => {
@@ -29,6 +34,7 @@ export const ArticleCreate = () => {
     return (
         <div>
             <form
+                className="form-inline"
                 onSubmit={e => {
                     e.preventDefault();
 
@@ -46,13 +52,25 @@ export const ArticleCreate = () => {
                     input.value = '';
                 }}
             >
-                <input
-                    ref={node => {
-                        input = node;
-                    }}
-                />
+                <div className="form-group">
 
-                <button type="submit">Create</button>
+                    <label htmlFor="article-name">Name</label>
+
+                    <input
+                        name="article-name"
+                        className="form-control mx-2"
+                        ref={node => {
+                            input = node;
+                        }}
+                    />
+                
+                </div>
+
+                <button type="submit" className="btn btn-success">
+                    
+                    <Plus />Create
+                    
+                </button>
 
             </form>
         </div>
