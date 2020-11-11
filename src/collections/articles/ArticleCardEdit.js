@@ -73,13 +73,13 @@ export const ArticleCardEdit = ({ article }) => {
 
                 <div className="card-toolbar">
 
-                    <button type="submit" className="btn btn-success mx-1">
+                    <button type="submit" className="btn btn-success btn-sm mx-1">
                         
                         <Check />Update
                     
                     </button>
 
-                    <Link to={`/articles/${article.id}`} className="btn btn-link mx-1">Cancel</Link>
+                    <Link to={`/articles`} className="btn btn-link btn-sm mx-1">Cancel</Link>
 
                 </div>
 

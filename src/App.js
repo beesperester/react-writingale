@@ -1,5 +1,6 @@
 // import './App.css';
 import Articles, { modes } from './collections/articles/Articles';
+import Article from './collections/articles/Article';
 
 import {
     Router,
@@ -28,6 +29,9 @@ const App = () => {
                     </Route>
                     <Route path="/articles/:id/edit">
                         <Articles mode={modes.edit} />
+                    </Route>
+                    <Route path="/articles/:id">
+                        <Article />
                     </Route>
                     <Route path="/articles">
                         <Articles mode={modes.list} />

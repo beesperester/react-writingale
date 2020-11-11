@@ -2,43 +2,53 @@ import gql from "graphql-tag";
 
 export const RETRIEVE_ALL = gql`
 {
-  allArticles{
-    nodes{
-      id,
-      name
+    allArticles {
+        nodes {
+            id,
+            name
+        }
     }
-  }
+}
+`;
+
+export const RETRIEVE_BY_ID = gql`
+query ArticleByID($id: Int!) {
+    articleById(id: $id) {
+        id,
+        name,
+    }
 }
 `;
 
 export const CREATE = gql`
 mutation CreateArticle($input: CreateArticleInput!) {
-  createArticle(input: $input) {
-    article {
-      id,
-      name
+    createArticle(input: $input) {
+        article {
+            id,
+            name
+        }
     }
-  }
 }
 `;
 
 export const UPDATE_BY_ID = gql`
 mutation UpdateArticle($input: UpdateArticleByIdInput!) {
-  updateArticleById(input: $input) {
-    article {
-      id, name
+    updateArticleById(input: $input) {
+        article {
+            id, 
+            name
+        }
     }
-  }
 }
 `;
 
 export const DELETE_BY_ID = gql`
 mutation DeleteArticle($input: DeleteArticleByIdInput!) {
-  deleteArticleById(input: $input) {
-    article {
-      id,
-      name
+    deleteArticleById(input: $input) {
+        article {
+            id,
+            name
+        }
     }
-  }
 }
 `;

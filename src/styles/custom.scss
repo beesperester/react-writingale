@@ -17,3 +17,7 @@
 .btn > svg {
     margin-right: ($spacer * 0.25);
 }
+
+.card.article {
+    min-height: ($spacer * 15);
+}

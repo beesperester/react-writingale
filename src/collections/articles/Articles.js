@@ -1,8 +1,8 @@
+// apollo
 import { useQuery } from '@apollo/react-hooks';
-import {
-    Link,
-    useParams
-} from 'react-router-dom';
+
+// router
+import { useParams } from 'react-router-dom';
 
 // app
 import { RETRIEVE_ALL } from './ArticleSchema';

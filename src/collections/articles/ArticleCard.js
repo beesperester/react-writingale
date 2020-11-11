@@ -34,7 +34,7 @@ export const ArticleCard = ({ article, editable }) => {
     });
 
     return (
-        <div className="card">
+        <div className="card article">
 
             <div className="card-body">
 
