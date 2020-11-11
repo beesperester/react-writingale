@@ -6,6 +6,7 @@ import { useParams } from 'react-router-dom';
 
 // app
 import { RETRIEVE_BY_ID } from './ArticleSchema';
+import { Sections } from '../sections/Sections';
 
 export const Article = () => {
     const params = useParams();
@@ -20,9 +21,19 @@ export const Article = () => {
     if (error) return <p>Error :(</p>;
 
     return (
-        <div className="container">
+        <div className="article">
 
-            <h1>{data.articleById.name}</h1>
+            <div className="container">
+
+                <h1>{data.articleById.name}</h1>
+
+            </div>
+
+            <div className="container">
+
+                <Sections article={data.articleById} />
+
+            </div>
 
         </div>
     );

@@ -16,6 +16,12 @@ query ArticleByID($id: Int!) {
     articleById(id: $id) {
         id,
         name,
+        sectionsByArticleId(orderBy:SORTING_ASC) {
+            nodes {
+                id,
+                contents
+            }      
+        }
     }
 }
 `;
