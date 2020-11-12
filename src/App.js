@@ -1,5 +1,5 @@
 // import './App.css';
-import Articles, { modes } from './collections/articles/Articles';
+import Articles from './collections/articles/Articles';
 import Article from './collections/articles/Article';
 
 import {
@@ -27,14 +27,11 @@ const App = () => {
                     <Route exact path="/">
                         <h1>Home</h1>
                     </Route>
-                    <Route path="/articles/:id/edit">
-                        <Articles mode={modes.edit} />
-                    </Route>
-                    <Route path="/articles/:id">
+                    <Route path="/articles/:nodeId">
                         <Article />
                     </Route>
                     <Route path="/articles">
-                        <Articles mode={modes.list} />
+                        <Articles />
                     </Route>
                 </Switch>
             </div>

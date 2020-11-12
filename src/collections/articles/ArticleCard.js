@@ -1,8 +1,11 @@
 // react
+import { useState } from 'react';
+
+// apollo
 import { useMutation } from '@apollo/react-hooks';
 
 // bootstrap
-import { PencilFill, TrashFill, ArrowUpRight } from 'react-bootstrap-icons';
+import { PencilFill, TrashFill, ArrowUpRight, Check, X } from 'react-bootstrap-icons';
 
 // router
 import {
@@ -10,10 +13,29 @@ import {
 } from 'react-router-dom';
 
 // app
-import { RETRIEVE_ALL, DELETE_BY_ID } from './ArticleSchema';
+import { RETRIEVE_ALL, UPDATE, DELETE } from './ArticleSchema';
+
+const modes = {
+    show: Symbol('show'),
+    edit: Symbol('edit')
+}
 
 export const ArticleCard = ({ article, editable }) => {
-    const [deleteArticle] = useMutation(DELETE_BY_ID, {
+    let input;
+
+    // state
+    const [inputValue, setInput] = useState(article.name);
+
+    const [mode, switchMode] = useState(modes.show);
+
+    // mutations
+    const [updateArticle] = useMutation(UPDATE, {
+        onCompleted(data) {
+            switchMode(modes.show);
+        }
+    });
+
+    const [deleteArticle] = useMutation(DELETE, {
         update(cache, { data }) {
             const { allArticles } = cache.readQuery({
                 query: RETRIEVE_ALL
@@ -25,13 +47,88 @@ export const ArticleCard = ({ article, editable }) => {
                     allArticles: {
                         ...allArticles,
                         nodes: [
-                            ...allArticles.nodes.filter(x => x.id !== article.id)
+                            ...allArticles.nodes.filter(x => x.nodeId !== article.nodeId)
                         ]
                     }
                 }
             })
         }
     });
+
+    if (mode === modes.edit) {
+        return (
+            <div className="card article">
+
+                <form
+                    onSubmit={e => {
+                        e.preventDefault();
+
+                        if (!input.value) return;
+
+                        updateArticle({
+                            variables: {
+                                input: {
+                                    nodeId: article.nodeId,
+                                    articlePatch: {
+                                        name: input.value
+                                    }
+                                }
+                            }
+                        });
+                    }}
+                >
+
+                    <div className="card-body form-inline">
+
+                        <div className="form-group">
+
+                            <label htmlFor="article-name">Name</label>
+
+                            <input
+                                name="article-name"
+                                className="form-control mx-2"
+                                ref={node => {
+                                    input = node;
+                                }}
+                                onChange={e => {
+                                    setInput(e.target.value)
+                                }}
+                                value={inputValue}
+                            />
+
+                        </div>
+
+                    </div>
+
+                    <div className="card-toolbar">
+
+                        <button type="submit" className="btn btn-success btn-sm mx-1">
+                            
+                            <Check />Update
+                        
+                        </button>
+
+                        <button 
+                            className="btn btn-link btn-sm mx-1"
+                            onClick={e => {
+                                e.preventDefault();
+
+                                switchMode(modes.show);
+                            }}
+                        >
+                            <X />Cancel
+                            
+                        </button>
+
+                    </div>
+
+                    <div className="card-toolbar-spacer"></div>
+
+                </form>
+                
+            </div>
+        );
+    }
 
     return (
         <div className="card article">
@@ -44,18 +141,25 @@ export const ArticleCard = ({ article, editable }) => {
 
             <div className="card-toolbar">
 
-                <Link to={`/articles/${article.id}`} className="btn btn-primary mx-1">
+                <Link to={`/articles/${article.nodeId}`} className="btn btn-primary mx-1">
                     
                     <ArrowUpRight />Open
                     
                 </Link>
 
                 {editable ? (
-                    <Link to={`/articles/${article.id}/edit`} className="btn btn-success btn-sm mx-1">
+                    <button 
+                        className="btn btn-success btn-sm mx-1"
+                        onClick={e => {
+                            e.preventDefault();
+
+                            switchMode(modes.edit);
+                        }}
+                    >
                         
-                        <PencilFill />Edit
+                        <PencilFill />Edit    
                         
-                    </Link>
+                    </button>
                 ) : undefined}
 
                 {editable ? (
@@ -67,7 +171,7 @@ export const ArticleCard = ({ article, editable }) => {
                             deleteArticle({
                                 variables: {
                                     input: {
-                                        id: article.id
+                                        nodeId: article.nodeId
                                     }
                                 }
                             })

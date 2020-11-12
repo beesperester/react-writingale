@@ -5,15 +5,15 @@ import { useQuery } from '@apollo/react-hooks';
 import { useParams } from 'react-router-dom';
 
 // app
-import { RETRIEVE_BY_ID } from './ArticleSchema';
+import { RETRIEVE } from './ArticleSchema';
 import { Sections } from '../sections/Sections';
 
 export const Article = () => {
     const params = useParams();
 
-    const { loading, error, data } = useQuery(RETRIEVE_BY_ID, {
+    const { loading, error, data } = useQuery(RETRIEVE, {
         variables: {
-            id: parseInt(params.id)
+            nodeId: params.nodeId
         }
     });
     
@@ -25,13 +25,13 @@ export const Article = () => {
 
             <div className="container">
 
-                <h1>{data.articleById.name}</h1>
+                <h1>{data.article.name}</h1>
 
             </div>
 
             <div className="container">
 
-                <Sections article={data.articleById} />
+                <Sections article={data.article} />
 
             </div>
 
