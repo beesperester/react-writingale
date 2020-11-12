@@ -6,27 +6,11 @@ import reportWebVitals from './reportWebVitals';
 import './styles/custom.scss';
 
 // apollo
-import { ApolloClient } from 'apollo-client';
-import { InMemoryCache } from 'apollo-cache-inmemory';
-import { HttpLink } from 'apollo-link-http';
-import { ApolloProvider } from '@apollo/react-hooks';
+import { ApolloProvider } from '@apollo/client';
 
 // app
+import client from './client';
 import App from './App';
-
-const cache = new InMemoryCache({
-    dataIdFromObject(responseObject) {
-        return responseObject.nodeId;
-    }
-});
-const link = new HttpLink({
-    uri: 'http://localhost:5000/graphql'
-})
-
-const client = new ApolloClient({
-    cache,
-    link
-})
 
 ReactDOM.render(
     <ApolloProvider client={client}>

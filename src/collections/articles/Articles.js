@@ -1,5 +1,5 @@
 // apollo
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery } from '@apollo/client';
 
 // app
 import { RETRIEVE_ALL } from './ArticleSchema';

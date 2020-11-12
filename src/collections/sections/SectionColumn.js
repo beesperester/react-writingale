@@ -4,7 +4,7 @@ import { useQuery } from '@apollo/client';
 // app
 import { RETRIEVE } from './SectionsSchema';
 
-export const Section = ({ section }) => {
+export const SectionColumn = ({ section, accumulator }) => {
     const { loading, error, data } = useQuery(RETRIEVE, {
         variables: {
             nodeId: section.nodeId
@@ -14,17 +14,20 @@ export const Section = ({ section }) => {
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error :(</p>;
 
+    data.section.sectionsBySectionId.nodes.forEach(node => {
+        accumulator(SectionColumn({
+            section: node,
+            accumulator: x => {}
+        }));
+    })
+
     return (
         <div className="section">
 
             <p>{data.section.contents}</p>
 
-            {data.section.sectionsBySectionId.nodes.map(node => (
-                <Section key={node.id} section={node} />
-            ))}
-
         </div>
     );
 };
 
-export default Section;
+export default SectionColumn;

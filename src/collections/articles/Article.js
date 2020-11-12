@@ -1,12 +1,12 @@
 // apollo
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery } from '@apollo/client';
 
 // router
 import { useParams } from 'react-router-dom';
 
 // app
 import { RETRIEVE } from './ArticleSchema';
-import { Sections } from '../sections/Sections';
+import { Sections } from '../sections/SectionsColumns';
 
 export const Article = () => {
     const params = useParams();

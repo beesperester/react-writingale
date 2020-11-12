@@ -1,5 +1,5 @@
 // apollo
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 
 // bootstrap
 import { Plus } from 'react-bootstrap-icons';

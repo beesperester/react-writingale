@@ -2,7 +2,7 @@
 import { useState } from 'react';
 
 // apollo
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 
 // bootstrap
 import { PencilFill, TrashFill, ArrowUpRight, Check, X } from 'react-bootstrap-icons';
