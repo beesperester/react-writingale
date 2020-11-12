@@ -5,6 +5,7 @@ export const RETRIEVE_ALL = gql`
     allArticles {
         nodes {
             nodeId
+            id
             name
         }
     }
@@ -12,13 +13,15 @@ export const RETRIEVE_ALL = gql`
 `;
 
 export const RETRIEVE = gql`
-query ArticleByID($id: Int!) {
-    articleById(id: $id) {
+query Article($nodeId: ID!) {
+    article(nodeId: $nodeId) {
         nodeId
+        id
         name
         sectionsByArticleId(orderBy:SORTING_ASC) {
             nodes {
                 nodeId
+                id
                 contents
             }      
         }
@@ -31,6 +34,7 @@ mutation CreateArticle($input: CreateArticleInput!) {
     createArticle(input: $input) {
         article {
             nodeId
+            id
             name
         }
     }
@@ -42,6 +46,7 @@ mutation UpdateArticle($input: UpdateArticleInput!) {
     updateArticle(input: $input) {
         article {
             nodeId
+            id
             name
         }
     }
@@ -53,6 +58,7 @@ mutation DeleteArticle($input: DeleteArticleInput!) {
     deleteArticle(input: $input) {
         article {
             nodeId
+            id
             name
         }
     }

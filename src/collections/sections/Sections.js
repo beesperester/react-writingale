@@ -6,7 +6,7 @@ export const Sections = ({ article }) => {
         <div>
 
             {article.sectionsByArticleId.nodes.map(node => (
-                <Section key={node.id} id={node.id} />
+                <Section key={node.nodeId} section={node} />
             ))}
 
         </div>

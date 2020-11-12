@@ -2,12 +2,12 @@
 import { useQuery } from '@apollo/react-hooks';
 
 // app
-import { RETRIEVE_BY_ID } from './SectionsSchema';
+import { RETRIEVE } from './SectionsSchema';
 
-export const Section = ({ id }) => {
-    const { loading, error, data } = useQuery(RETRIEVE_BY_ID, {
+export const Section = ({ section }) => {
+    const { loading, error, data } = useQuery(RETRIEVE, {
         variables: {
-            id: id
+            nodeId: section.nodeId
         }
     });
     
@@ -17,10 +17,10 @@ export const Section = ({ id }) => {
     return (
         <div className="section">
 
-            <p>{data.sectionById.contents}</p>
+            <p>{data.section.contents}</p>
 
-            {data.sectionById.sectionsBySectionId.nodes.map(node => (
-                <Section key={node.id} id={node.id} />
+            {data.section.sectionsBySectionId.nodes.map(node => (
+                <Section key={node.id} section={node} />
             ))}
 
         </div>
