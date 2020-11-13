@@ -47,9 +47,7 @@ export const useSections = (nodes) => {
     });
 
     useEffect(() => {
-        retrieveRecursively(nodes).then(() => {   
-            console.log('loaded sections');
-            
+        retrieveRecursively(nodes).then(() => {               
             setState((state) => {
                 return {
                     ...state,

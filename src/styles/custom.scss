@@ -33,13 +33,40 @@
         background-color: $gray-700;
     }
 
-    .section-action-child {
+    .section-tools {
         position: absolute;
-        top: 50%;
-        right: 0;
+        top: 0;
+        left: 0;
 
-        margin-top: -$spacer;
+        width: 100%;
+        height: 100%;
+
+        .section-action-previous {
+            position: absolute;
+            top: 0;
+            right: 50%;
+
+            transform: translate(50%, -25%);
+        }
+
+        .section-action-child {
+            position: absolute;
+            top: 50%;
+            right: 0;
+
+            transform: translate(25%, -50%);
+        }
+
+        .section-action-next {
+            position: absolute;
+            bottom: 0;
+            right: 50%;
+
+            transform: translate(50%, 25%);
+        }
     }
+
+
 }
 
 .columns {

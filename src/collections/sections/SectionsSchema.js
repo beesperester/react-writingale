@@ -5,7 +5,13 @@ fragment sectionFragment on Section {
     nodeId
     id
     contents
+    sorting
+    sectionId
+    articleId
     sectionBySectionId {
+        nodeId
+    }
+    articleByArticleId {
         nodeId
     }
     sectionsBySectionId(orderBy: SORTING_ASC) {
