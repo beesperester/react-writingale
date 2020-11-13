@@ -5,6 +5,9 @@ fragment sectionFragment on Section {
     nodeId
     id
     contents
+    sectionBySectionId {
+        nodeId
+    }
     sectionsBySectionId(orderBy: SORTING_ASC) {
         nodes {
             nodeId

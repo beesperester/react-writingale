@@ -8,11 +8,23 @@ import { useMutation } from '@apollo/client';
 import client from '../../client';
 import { RETRIEVE, CREATE, FRAGMENT_SECTION } from './SectionsSchema';
 
-export const Section = ({ section, activeNodeId, setActiveNodeId }) => {
-    const isActive = activeNodeId === section.nodeId;
+const findParents = (section, parents) => {
+    if (section.sectionBySectionId && section.sectionBySectionId.nodeId) {
+        parents.push(section.sectionBySectionId.nodeId);
 
+        const cachedParentSection = client.cache.readFragment({
+            id: section.sectionBySectionId.nodeId,
+            fragment: FRAGMENT_SECTION
+        });
+
+        findParents(cachedParentSection, parents);
+    }
+}
+
+export const Section = ({ section, isActive, isLeaf, setActiveNodeId, setActiveParentIds }) => {
     const [createChildSection] = useMutation(CREATE, {
         update(cache, { data }) {
+            const createdSection = data.createSection.section;
             const cachedSection = cache.readFragment({
                 id: section.nodeId,
                 fragment: FRAGMENT_SECTION
@@ -26,13 +38,19 @@ export const Section = ({ section, activeNodeId, setActiveNodeId }) => {
                         ...cachedSection.sectionsBySectionId,
                         nodes: [
                             ...cachedSection.sectionsBySectionId.nodes,
-                            data.createSection.section
+                            createdSection
                         ]
                     }
                 }
             });
 
-            setActiveNodeId(data.createSection.section.nodeId);
+            setActiveNodeId(createdSection.nodeId);
+
+            const parents = [];
+
+            findParents(createdSection, parents);
+
+            setActiveParentIds(parents);
         }
     });
 
@@ -43,6 +61,12 @@ export const Section = ({ section, activeNodeId, setActiveNodeId }) => {
                 e.preventDefault();
 
                 setActiveNodeId(section.nodeId);
+
+                const parents = [];
+
+                findParents(section, parents);
+
+                setActiveParentIds(parents);
             }}
         >
 
@@ -52,7 +76,7 @@ export const Section = ({ section, activeNodeId, setActiveNodeId }) => {
 
             </div>
 
-            {isActive ? (
+            {isLeaf ? (
                 <div className="section-action-child">
 
                     <button 

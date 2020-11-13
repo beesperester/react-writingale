@@ -31,14 +31,12 @@ const buildColumns = (nodes, columns, depth) => {
 
 export const Sections = ({ article }) => {
     const [activeNodeId, setActiveNodeId] = useState(false);
+    const [activeParentIds, setActiveParentIds] = useState([]);
 
     const { loading, error } = useSections(article.sectionsByArticleId.nodes);
 
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error :(</p>;
-
-    console.log(client.cache.data.data);
-
 
     // build columns from sections
     const columns = buildColumns(article.sectionsByArticleId.nodes, [], 0);
@@ -53,7 +51,17 @@ export const Sections = ({ article }) => {
                 {columns.map((rows, index) => (
                     <div key={index} className="column flex-fill">
                         
-                        {rows.map(node => <Section key={node.nodeId} section={node} activeNodeId={activeNodeId} setActiveNodeId={setActiveNodeId}/>)}
+                        {rows.map(node => 
+                            <Section 
+                                key={node.nodeId} 
+                                section={node}
+                                isActive={activeNodeId === node.nodeId || activeParentIds.includes(node.nodeId)}
+                                isLeaf={activeNodeId === node.nodeId}
+                                // activeNodeId={activeNodeId} 
+                                setActiveNodeId={setActiveNodeId}
+                                setActiveParentIds={setActiveParentIds}
+                            />
+                        )}
                     
                     </div>
                     
