@@ -22,6 +22,28 @@
     min-height: ($spacer * 15);
 }
 
-.section {
-    // padding-left: 1rem;
+.card.section {
+    position: relative;
+
+    min-height: ($spacer * 15);
+
+    margin: ($spacer);
+
+    &-active {
+        background-color: $gray-700;
+    }
+
+    .section-action-child {
+        position: absolute;
+        top: 50%;
+        right: 0;
+
+        margin-top: -$spacer;
+    }
+}
+
+.columns {
+    .column {
+        overflow-y: auto;
+    }
 }

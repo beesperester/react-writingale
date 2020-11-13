@@ -1,8 +1,12 @@
+// react
+import { useState } from 'react';
+
 // app
 import { FRAGMENT_SECTION } from './SectionsSchema';
 import client from '../../client';
 import { useSections } from './sectionsHooks';
 import Section from './Section';
+import SectionCreate from './SectionCreate';
 
 const buildColumns = (nodes, columns, depth) => {
     nodes.forEach(node => {
@@ -23,29 +27,39 @@ const buildColumns = (nodes, columns, depth) => {
     })
 
     return columns;
-}
+};
 
 export const Sections = ({ article }) => {
+    const [activeNodeId, setActiveNodeId] = useState(false);
+
     const { loading, error } = useSections(article.sectionsByArticleId.nodes);
 
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error :(</p>;
+
+    console.log(client.cache.data.data);
 
 
     // build columns from sections
     const columns = buildColumns(article.sectionsByArticleId.nodes, [], 0);
 
     return (
-        <div className="d-flex">
+        <div>
 
-            {columns.map((rows, index) => (
-                <div key={index} className="column flex-grow-1">
+            <SectionCreate article={article} />
+
+            <div className="columns d-flex">
+
+                {columns.map((rows, index) => (
+                    <div key={index} className="column flex-fill">
+                        
+                        {rows.map(node => <Section key={node.nodeId} section={node} activeNodeId={activeNodeId} setActiveNodeId={setActiveNodeId}/>)}
                     
-                    {rows.map(node => <Section key={node.nodeId} section={node}/>)}
-                
-                </div>
-                
-            ))}
+                    </div>
+                    
+                ))}
+
+            </div>
 
         </div>
     );

@@ -42,28 +42,24 @@ const retrieveRecursively = async (nodes) => {
 
 export const useSections = (nodes) => {
     const [state, setState] = useState({
-        started: false,
         loading: true,
         error: false
     });
 
-    if (!state.started && state.loading) {
-        setState({
-            ...state,
-            started: true
-        });
-
-        retrieveRecursively(nodes).then(() => {
-            console.log('done loading');
-    
-            setState({
-                ...state,
-                loading: false
+    useEffect(() => {
+        retrieveRecursively(nodes).then(() => {   
+            console.log('loaded sections');
+            
+            setState((state) => {
+                return {
+                    ...state,
+                    loading: false
+                }
             });
         }).catch(reason => {
             console.error(reason);
         });
-    }
+    }, [nodes]);
 
     return state;
 };

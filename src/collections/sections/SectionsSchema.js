@@ -19,5 +19,18 @@ query Section($nodeId: ID!) {
         ...sectionFragment
     }
 }
+
+${FRAGMENT_SECTION}
+`;
+
+export const CREATE = gql`
+mutation CreateSection($input: CreateSectionInput!) {
+    createSection(input: $input) {
+        section {
+            ...sectionFragment
+        }
+    }
+}
+
 ${FRAGMENT_SECTION}
 `;
