@@ -1,27 +1,12 @@
-// apollo
-import { useQuery } from '@apollo/client';
-
-// app
-import { RETRIEVE } from './SectionsSchema';
-
 export const Section = ({ section }) => {
-    const { loading, error, data } = useQuery(RETRIEVE, {
-        variables: {
-            nodeId: section.nodeId
-        }
-    });
-    
-    if (loading) return <p>Loading...</p>;
-    if (error) return <p>Error :(</p>;
-
     return (
-        <div className="section">
+        <div className="card section">
 
-            <p>{data.section.contents}</p>
+            <div className="card-body">
 
-            {data.section.sectionsBySectionId.nodes.map(node => (
-                <Section key={node.id} section={node} />
-            ))}
+                <p>{section.contents}</p>
+
+            </div>
 
         </div>
     );

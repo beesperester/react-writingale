@@ -1,66 +1,10 @@
-// react
-import { useState, useEffect } from 'react';
-
-// apollo
-// import { useQuery, gql } from '@apollo/client';
-
 // app
-import { RETRIEVE, FRAGMENT_SECTION } from './SectionsSchema';
+import { FRAGMENT_SECTION } from './SectionsSchema';
 import client from '../../client';
+import { useSections } from './sectionsHooks';
+import Section from './Section';
 
-export const Section = ({ section }) => {
-    return (
-        <div className="card section">
-
-            <div className="card-body">
-
-                <p>{section.contents}</p>
-
-            </div>
-
-        </div>
-    );
-};
-
-export const retrieveRecursively = async (nodes) => {
-    for (let i = 0; i < nodes.length; i++) {
-        const node = nodes[i];
-        
-        try {
-            // test if fragment is in cache
-    
-            const cachedSection = client.readFragment({
-                id: node.nodeId,
-                fragment: FRAGMENT_SECTION
-            });
-
-            await retrieveRecursively(cachedSection.sectionsBySectionId.nodes);
-        } catch(e) {
-            // load missing fragment
-    
-            console.info(`load fragment for ${node.nodeId}`);
-    
-            const result = await client.query({
-                query: RETRIEVE,
-                variables: {
-                    nodeId: node.nodeId
-                }
-            });
-
-            await retrieveRecursively(result.data.section.sectionsBySectionId.nodes);
-    
-            // write missing fragment to cache
-    
-            client.writeFragment({
-                id: node.nodeId,
-                fragment: FRAGMENT_SECTION,
-                data: result.data.section
-            });
-        }
-    }
-};
-
-export const buildColumns = (nodes, columns, depth) => {
+const buildColumns = (nodes, columns, depth) => {
     nodes.forEach(node => {
         const cachedSection = client.readFragment({
             id: node.nodeId,
@@ -81,35 +25,15 @@ export const buildColumns = (nodes, columns, depth) => {
     return columns;
 }
 
-const useSections = (nodes) => {
-    const [loaded, setLoaded] = useState(false);
-
-    useEffect(() => {
-        retrieveRecursively(nodes).then(() => {
-            setLoaded(true);
-        }).catch(reason => {
-            console.error(reason);
-        })
-
-        return () => {};
-    });
-
-    return loaded;
-}
-
 export const Sections = ({ article }) => {
-    // const [columns, setColumns] = useState([[]]);
+    const { loading, error } = useSections(article.sectionsByArticleId.nodes);
 
-    const loaded = useSections(article.sectionsByArticleId.nodes);
-
-    if (!loaded) return <p>Loading...</p>;
-
-    // console.log(client.cache.data.data);
+    if (loading) return <p>Loading...</p>;
+    if (error) return <p>Error :(</p>;
 
 
     // build columns from sections
     const columns = buildColumns(article.sectionsByArticleId.nodes, [], 0);
-    // const columns = [];
 
     return (
         <div className="d-flex">

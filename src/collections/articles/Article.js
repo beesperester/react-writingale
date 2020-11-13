@@ -29,7 +29,7 @@ export const Article = () => {
 
             </div>
 
-            <div className="container">
+            <div className="p-4">
 
                 <Sections article={data.article} />
 
