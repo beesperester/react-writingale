@@ -8,9 +8,11 @@ import { Plus } from 'react-bootstrap-icons';
 import { RETRIEVE as RETRIEVE_ARTICLE } from '../articles/ArticleSchema';
 import { RETRIEVE, CREATE } from './SectionsSchema';
 
-export const SectionCreate = ({ article }) => {
+export const SectionCreate = ({ article, setActiveNode }) => {
     const [createSection] = useMutation(CREATE, {
         update(cache, { data }) {
+            const createdSection = data.createSection.section;
+
             const result = cache.readQuery({
                 query: RETRIEVE_ARTICLE,
                 variables: {
@@ -27,12 +29,14 @@ export const SectionCreate = ({ article }) => {
                             ...result.article.sectionsByArticleId,
                             nodes: [
                                 ...result.article.sectionsByArticleId.nodes,
-                                data.createSection.section
+                                createdSection
                             ]
                         }
                     }
                 }
             });
+
+            setActiveNode(createdSection);
         }
     });
 

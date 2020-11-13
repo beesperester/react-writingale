@@ -5,23 +5,9 @@ import { useState } from 'react';
 import { useMutation } from '@apollo/client';
 
 // app
-import client from '../../client';
-import { RETRIEVE, CREATE, FRAGMENT_SECTION } from './SectionsSchema';
+import { CREATE, FRAGMENT_SECTION } from './SectionsSchema';
 
-const findParents = (section, parents) => {
-    if (section.sectionBySectionId && section.sectionBySectionId.nodeId) {
-        parents.push(section.sectionBySectionId.nodeId);
-
-        const cachedParentSection = client.cache.readFragment({
-            id: section.sectionBySectionId.nodeId,
-            fragment: FRAGMENT_SECTION
-        });
-
-        findParents(cachedParentSection, parents);
-    }
-}
-
-export const Section = ({ section, isActive, isLeaf, setActiveNodeId, setActiveParentIds }) => {
+export const Section = ({ section, isActive, isLeaf, setActiveNode }) => {
     const [createChildSection] = useMutation(CREATE, {
         update(cache, { data }) {
             const createdSection = data.createSection.section;
@@ -44,13 +30,7 @@ export const Section = ({ section, isActive, isLeaf, setActiveNodeId, setActiveP
                 }
             });
 
-            setActiveNodeId(createdSection.nodeId);
-
-            const parents = [];
-
-            findParents(createdSection, parents);
-
-            setActiveParentIds(parents);
+            setActiveNode(createdSection);
         }
     });
 
@@ -60,13 +40,7 @@ export const Section = ({ section, isActive, isLeaf, setActiveNodeId, setActiveP
             onClick={e => {
                 e.preventDefault();
 
-                setActiveNodeId(section.nodeId);
-
-                const parents = [];
-
-                findParents(section, parents);
-
-                setActiveParentIds(parents);
+                setActiveNode(section);
             }}
         >
 

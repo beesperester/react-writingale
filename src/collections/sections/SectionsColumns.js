@@ -29,9 +29,35 @@ const buildColumns = (nodes, columns, depth) => {
     return columns;
 };
 
+const findParents = (section) => {
+    let parents = [];
+
+    if (section.sectionBySectionId && section.sectionBySectionId.nodeId) {
+        parents.push(section.sectionBySectionId.nodeId);
+
+        const cachedParentSection = client.cache.readFragment({
+            id: section.sectionBySectionId.nodeId,
+            fragment: FRAGMENT_SECTION
+        });
+
+        parents = parents.concat(findParents(cachedParentSection));
+    }
+
+    return parents;
+}
+
 export const Sections = ({ article }) => {
-    const [activeNodeId, setActiveNodeId] = useState(false);
-    const [activeParentIds, setActiveParentIds] = useState([]);
+    const [activeNodes, setActiveNodes] = useState({
+        leaf: undefined,
+        parents: []
+    });
+
+    const setActiveNode = (node) => {
+        setActiveNodes({
+            leaf: node.nodeId,
+            parents: findParents(node)
+        })
+    };
 
     const { loading, error } = useSections(article.sectionsByArticleId.nodes);
 
@@ -44,7 +70,7 @@ export const Sections = ({ article }) => {
     return (
         <div>
 
-            <SectionCreate article={article} />
+            <SectionCreate article={article} setActiveNode={setActiveNode} />
 
             <div className="columns d-flex">
 
@@ -55,11 +81,10 @@ export const Sections = ({ article }) => {
                             <Section 
                                 key={node.nodeId} 
                                 section={node}
-                                isActive={activeNodeId === node.nodeId || activeParentIds.includes(node.nodeId)}
-                                isLeaf={activeNodeId === node.nodeId}
+                                isActive={activeNodes.leaf === node.nodeId || activeNodes.parents.includes(node.nodeId)}
+                                isLeaf={activeNodes.leaf === node.nodeId}
                                 // activeNodeId={activeNodeId} 
-                                setActiveNodeId={setActiveNodeId}
-                                setActiveParentIds={setActiveParentIds}
+                                setActiveNode={setActiveNode}
                             />
                         )}
                     
