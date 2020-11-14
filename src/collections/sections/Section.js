@@ -8,24 +8,25 @@ import { useMutation } from '@apollo/client';
 import { FRAGMENT_ARTICLE } from '../articles/ArticleSchema';
 import { CREATE, FRAGMENT_SECTION } from './SectionsSchema';
 
-const sortNodes = (a, b) => {
-    return a.sorting - b.sorting;
-};
+const updateSiblings = cache => createdNode => nodes => {
+    nodes.forEach(node => {
+        const cachedNode = cache.readFragment({
+            id: node.nodeId,
+            fragment: FRAGMENT_SECTION
+        });
 
-const fixSorting = (createdNode) => (node) => {
-    console.log(`${createdNode.sorting} : ${node.sorting}`);
-    console.log(node);
+        const sorting = cachedNode.sorting >= createdNode.sorting 
+            ? cachedNode.sorting + 1 
+            : cachedNode.sorting;                    
 
-    if (node.sorting >= createdNode.sorting) {
-        console.log('fix sorting');
-
-        return {
-            ...node,
-            sorting: node.sorting + 1
-        }
-    }
-
-    return node;
+        cache.writeFragment({
+            id: node.nodeId,
+            fragment: FRAGMENT_SECTION,
+            data: {
+                sorting
+            }
+        });
+    });    
 }
 
 export const Section = ({ section, isActive, isLeaf, setActiveNode }) => {
@@ -69,24 +70,7 @@ export const Section = ({ section, isActive, isLeaf, setActiveNode }) => {
                 });
 
                 // update all siblings
-                cachedSection.sectionsBySectionId.nodes.forEach(node => {
-                    const cachedNode = cache.readFragment({
-                        id: node.nodeId,
-                        fragment: FRAGMENT_SECTION
-                    });
-
-                    const sorting = cachedNode.sorting >= createdSection.sorting 
-                        ? cachedNode.sorting + 1 
-                        : cachedNode.sorting;                    
-
-                    cache.writeFragment({
-                        id: node.nodeId,
-                        fragment: FRAGMENT_SECTION,
-                        data: {
-                            sorting
-                        }
-                    });
-                });                
+                updateSiblings(cache)(createdSection)(cachedSection.sectionsBySectionId.nodes);              
                 
                 // update parent section
                 cache.writeFragment({
@@ -104,53 +88,33 @@ export const Section = ({ section, isActive, isLeaf, setActiveNode }) => {
                 });
             }
             
-            // if (section.articleId) {
-            //     const id = section.articleByArticleId.nodeId;
+            if (section.articleId) {
+                const id = section.articleByArticleId.nodeId;
 
-            //     // read parent section
-            //     const cachedArticle = cache.readFragment({
-            //         id,
-            //         fragment: FRAGMENT_ARTICLE
-            //     });
+                // read parent section
+                const cachedArticle = cache.readFragment({
+                    id,
+                    fragment: FRAGMENT_ARTICLE
+                });
 
-            //     // update all siblings
-            //     const siblings = [createdSection];
+                // update all siblings
+                updateSiblings(cache)(createdSection)(cachedArticle.sectionsByArticleId.nodes); 
 
-            //     cachedArticle.sectionsByArticleId.nodes.forEach(node => {
-            //         const cachedNode = cache.readFragment({
-            //             id: node.nodeId,
-            //             fragment: FRAGMENT_SECTION
-            //         });
-
-            //         cachedNode.sorting = cachedNode.sorting >= createdSection.sorting 
-            //             ? cachedNode.sorting + 1 
-            //             : cachedNode.sorting;                    
-
-            //         cache.writeFragment({
-            //             id: node.nodeId,
-            //             fragment: FRAGMENT_SECTION,
-            //             data: {
-            //                 ...cachedNode
-            //             }
-            //         });
-
-            //         siblings.push(cachedNode);
-            //     });
-
-            //     // update parent article
-            //     cache.writeFragment({
-            //         id,
-            //         fragment: FRAGMENT_ARTICLE,
-            //         data: {
-            //             sectionsByArticleId: {
-            //                 ...cachedArticle.sectionsByArticleId,
-            //                 nodes: [
-            //                     ...siblings
-            //                 ].sort(sortNodes)
-            //             }
-            //         }
-            //     });
-            // }
+                // update parent article
+                cache.writeFragment({
+                    id,
+                    fragment: FRAGMENT_ARTICLE,
+                    data: {
+                        sectionsByArticleId: {
+                            ...cachedArticle.sectionsByArticleId,
+                            nodes: [
+                                ...cachedArticle.sectionsByArticleId.nodes,
+                                createdSection
+                            ]
+                        }
+                    }
+                });
+            }
 
             setActiveNode(createdSection);
         }

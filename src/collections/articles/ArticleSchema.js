@@ -5,6 +5,11 @@ fragment articleFragment on Article {
     nodeId
     id
     name
+    sectionsByArticleId(orderBy:SORTING_ASC) {
+        nodes {
+            nodeId
+        }      
+    }
 }
 `;
 
@@ -23,11 +28,6 @@ export const RETRIEVE = gql`
 query Article($nodeId: ID!) {
     article(nodeId: $nodeId) {
         ...articleFragment
-        sectionsByArticleId(orderBy:SORTING_ASC) {
-            nodes {
-                nodeId
-            }      
-        }
     }
 }
 ${FRAGMENT_ARTICLE}
