@@ -12,6 +12,22 @@ const sortNodes = (a, b) => {
     return a.sorting - b.sorting;
 };
 
+const fixSorting = (createdNode) => (node) => {
+    console.log(`${createdNode.sorting} : ${node.sorting}`);
+    console.log(node);
+
+    if (node.sorting >= createdNode.sorting) {
+        console.log('fix sorting');
+
+        return {
+            ...node,
+            sorting: node.sorting + 1
+        }
+    }
+
+    return node;
+}
+
 export const Section = ({ section, isActive, isLeaf, setActiveNode }) => {
     const [createChildSection] = useMutation(CREATE, {
         update(cache, { data }) {
@@ -44,15 +60,35 @@ export const Section = ({ section, isActive, isLeaf, setActiveNode }) => {
             const createdSection = data.createSection.section;
 
             if (section.sectionId) {
-                // update parent section
                 const id = section.sectionBySectionId.nodeId;
 
+                // read parent section
                 const cachedSection = cache.readFragment({
                     id,
                     fragment: FRAGMENT_SECTION
                 });
+
+                // update all siblings
+                cachedSection.sectionsBySectionId.nodes.forEach(node => {
+                    const cachedNode = cache.readFragment({
+                        id: node.nodeId,
+                        fragment: FRAGMENT_SECTION
+                    });
+
+                    const sorting = cachedNode.sorting >= createdSection.sorting 
+                        ? cachedNode.sorting + 1 
+                        : cachedNode.sorting;                    
+
+                    cache.writeFragment({
+                        id: node.nodeId,
+                        fragment: FRAGMENT_SECTION,
+                        data: {
+                            sorting
+                        }
+                    });
+                });                
                 
-    
+                // update parent section
                 cache.writeFragment({
                     id,
                     fragment: FRAGMENT_SECTION,
@@ -62,35 +98,59 @@ export const Section = ({ section, isActive, isLeaf, setActiveNode }) => {
                             nodes: [
                                 ...cachedSection.sectionsBySectionId.nodes,
                                 createdSection
-                            ].sort(sortNodes)
+                            ]
                         }
                     }
                 });
             }
             
-            if (section.articleId) {
-                // update parent article
-                const id = section.articleByArticleId.nodeId;
+            // if (section.articleId) {
+            //     const id = section.articleByArticleId.nodeId;
 
-                const cachedArticle = cache.readFragment({
-                    id,
-                    fragment: FRAGMENT_ARTICLE
-                });
+            //     // read parent section
+            //     const cachedArticle = cache.readFragment({
+            //         id,
+            //         fragment: FRAGMENT_ARTICLE
+            //     });
 
-                cache.writeFragment({
-                    id,
-                    fragment: FRAGMENT_ARTICLE,
-                    data: {
-                        sectionsBySectionId: {
-                            ...cachedArticle.sectionsBySectionId,
-                            nodes: [
-                                ...cachedArticle.sectionsBySectionId.nodes,
-                                createdSection
-                            ].sort(sortNodes)
-                        }
-                    }
-                });
-            }
+            //     // update all siblings
+            //     const siblings = [createdSection];
+
+            //     cachedArticle.sectionsByArticleId.nodes.forEach(node => {
+            //         const cachedNode = cache.readFragment({
+            //             id: node.nodeId,
+            //             fragment: FRAGMENT_SECTION
+            //         });
+
+            //         cachedNode.sorting = cachedNode.sorting >= createdSection.sorting 
+            //             ? cachedNode.sorting + 1 
+            //             : cachedNode.sorting;                    
+
+            //         cache.writeFragment({
+            //             id: node.nodeId,
+            //             fragment: FRAGMENT_SECTION,
+            //             data: {
+            //                 ...cachedNode
+            //             }
+            //         });
+
+            //         siblings.push(cachedNode);
+            //     });
+
+            //     // update parent article
+            //     cache.writeFragment({
+            //         id,
+            //         fragment: FRAGMENT_ARTICLE,
+            //         data: {
+            //             sectionsByArticleId: {
+            //                 ...cachedArticle.sectionsByArticleId,
+            //                 nodes: [
+            //                     ...siblings
+            //                 ].sort(sortNodes)
+            //             }
+            //         }
+            //     });
+            // }
 
             setActiveNode(createdSection);
         }
@@ -107,6 +167,8 @@ export const Section = ({ section, isActive, isLeaf, setActiveNode }) => {
         >
 
             <div className="card-body">
+
+                <strong>{section.id}:{section.sorting}</strong>
 
                 <p>{section.contents}</p>
 
@@ -128,7 +190,7 @@ export const Section = ({ section, isActive, isLeaf, setActiveNode }) => {
                                             section: {
                                                 sectionId: section.sectionId ? section.sectionId : undefined,
                                                 articleId: section.articleId ? section.articleId : undefined,
-                                                sorting: section.sorting - 1
+                                                sorting: Math.max(section.sorting - 1, 0)
                                             }
                                         }
                                     }
